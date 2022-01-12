@@ -1,0 +1,158 @@
+---
+title: "2021_week 42"
+author: "Tine"
+date: "10/13/2021"
+output: html_document
+---
+
+```{r set-up}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)    # data manipulation
+library(patchwork)    # arrange multiple plots
+library(ggtext)       # to add html to titles
+```
+
+
+```{r load data}
+load(here::here("Data", "2021-42 Fish"))
+```
+
+
+```{r create plots on production}
+p1 <- 
+  Production_Continent %>%
+  filter(Continent != "World") %>%
+  pivot_longer(cols = contains("sum"), names_to = "Production", values_to = "Sum") %>%
+  ggplot(aes(x = Year, y = Sum, fill = Production)) + 
+  geom_area() + 
+  scale_x_continuous(breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2018)) +
+  scale_y_continuous(breaks = seq(100000000, 400000000, 100000000),
+                     limits = c(0, 400000000),
+                     labels = scales::comma) +
+  facet_wrap(~Continent, nrow = 1) +
+  scale_fill_manual(values = c("#009E73", "#0072B2")) + 
+  labs(title = "<span style = 'font-size:10pt;'><b>Per continent</span style>") +
+  theme_minimal() +
+  theme(text                = element_text(family = "EB Garamond"),
+        plot.title          = element_markdown(margin    = margin(0, 0, 10, 0)),
+        plot.title.position = "plot",
+        plot.margin         = margin(0, 1, 1, 0, "cm"),
+        panel.grid.major.y  = element_line(color = "grey80", size = .1),
+        axis.title          = element_blank(),  
+        axis.text.x         = element_text(size = 6, 
+                                           color = "grey60",
+                                           margin = margin(-.25, 0, 0, 0, "cm")),
+        axis.text.y         = element_text(size = 6, color = "grey60"),
+        strip.text          = element_text(size = 9), 
+        panel.grid          = element_blank(),
+        panel.spacing.x     = unit(0.25, "cm"),
+        legend.position     = "none")
+
+p2 <- 
+  Production_World %>%
+  pivot_longer(cols = contains("sum"), names_to = "Production", values_to = "Sum") %>%
+  ggplot(aes(x = Year, y = Sum, fill = Production)) + 
+  geom_area() + 
+  scale_x_continuous(breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2018)) +
+  scale_fill_manual(values = c("#009E73", "#0072B2")) + 
+  labs(title = "<span style = 'font-size:10pt;'><b>Globally</span style>") +
+  theme_minimal() +
+  theme(text                = element_text(family = "EB Garamond"),
+        plot.title          = element_markdown(margin = margin(0, 0, 10, 0)),
+        plot.title.position = "plot",
+        plot.margin         = margin(0, 0, 1, 0, "cm"),
+        panel.grid.major.y  = element_line(color = "grey80", size = .1),
+        axis.title          = element_blank(),  
+        axis.text.x         = element_text(size = 6, 
+                                           color = "grey60",
+                                           margin = margin(-.25, 0, 0, 0, "cm")),
+        axis.text.y         = element_blank(),
+        panel.grid          = element_blank(),
+        legend.position     = "none")
+```
+
+```{r create plots on consumption}
+p3 <- 
+  Consumption_Continent %>%
+  filter(Continent != "World") %>%
+  ggplot(aes(x = Year, y = Consumption_avg)) + 
+  geom_point(color = "#D55E00", size = 2, alpha = .75, shape = ".") + 
+  scale_x_continuous(breaks = c(1961, 1970, 1980, 1990, 2000, 2010, 2018)) +
+  scale_y_continuous(breaks = seq(0, 40, 5), limits = c(0, 40)) +
+  facet_wrap(~Continent, nrow = 1) +
+  theme_minimal() +
+  theme(text                = element_text(family = "EB Garamond"),
+        plot.margin         = margin(0, 1, 0, 0, "cm"),
+        panel.grid.major.y  = element_line(color = "grey80", size = .1),
+        axis.title          = element_blank(),  
+        axis.text.x         = element_text(size = 6, 
+                                           color = "grey60",
+                                           margin = margin(-.25, 0, 0, 0, "cm")),
+        axis.text.y         = element_text(size = 6, color = "grey60"),
+        strip.text          = element_blank(), 
+        panel.grid          = element_blank(),
+        panel.spacing.x     = unit(0.25, "cm"),
+        legend.position     = "none")
+
+p4 <- 
+  Consumption_World %>%
+  ggplot(aes(x = Year, y = Consumption_avg)) + 
+  geom_point(color = "#D55E00", size = 2, alpha = .75, shape = ".") + 
+  scale_x_continuous(breaks = c(1961, 1970, 1980, 1990, 2000, 2010, 2018)) +
+  scale_y_continuous(breaks = seq(0, 40, 5), limits = c(0, 40)) +
+  theme_minimal() +
+  theme(text                = element_text(family = "EB Garamond"),
+        panel.grid.major.y  = element_line(color = "grey80", size = .1),
+        axis.title          = element_blank(),  
+        axis.text.x         = element_text(size = 6, 
+                                           color = "grey60",
+                                           margin = margin(-.25, 0, 0, 0, "cm")),
+        axis.text.y         = element_blank(),
+        panel.grid          = element_blank(),
+        legend.position     = "none")
+```
+
+```{r arrange plots}
+Production <- 
+  p1 + plot_spacer() + p2 + 
+  plot_layout(widths = c(6, 0.1, 2))
+
+Consumption <- 
+  p3 + plot_spacer() + p4 + 
+  plot_layout(widths = c(6, 0.1, 2))
+
+Fish_plot <- 
+  Production / Consumption +
+  plot_annotation(title = "<span style = 'font-size:16pt;'><b>Seafood</b></span style><br><span style = 'font-size:10pt;'><em>Seafood production (in metric tons) from 
+  <span style='color:#0072B2;'><b>wild catch</b></span style> relatively decreased from 1961 to 2018, while seafood production from <span style = 'color:
+       #009E73;'><b>aquaculture</b></span style> relatively increased. Meanwhile, <span style='color:#D55E00;'><b>seafood consumption</span style> (in kg per capita) increased globally from 13.7kg in 1961 to 22.1kg in 2018.</span style>",
+  caption= "<br><br>Data source: OurWorldinData.org | #tidytuesday | @TinevanDaal",
+  theme = theme(plot.title = element_textbox_simple(family  = "EB Garamond",
+                                                    padding = margin(0, 0, 1, 0, "cm")),
+                plot.caption = element_textbox_simple(family = "EB Garamond",
+                                                      color  = "grey80",
+                                                      size   = 6, 
+                                                      hjust  = 1))) 
+Fish_plot
+
+```
+
+```{r save plot}
+pdf_file <- here::here("Figures", "2021-42 Fish.pdf")
+
+ggsave(
+  pdf_file,
+  device = cairo_pdf,
+  width = 30, 
+  height = 21, 
+  units  = "cm"
+)
+
+```
+
+
+```{r clean workspace}
+rm(list = ls())
+```
+

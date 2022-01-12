@@ -1,0 +1,100 @@
+---
+title: "2021_week 43 (plot)"
+author: "Tine"
+date: "10/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse) # for data manipulation and plotting
+library(ggdist)    # to visualise distributions
+library(ggtext)    # to apply html-code to plot titles
+library(ggthemr)   # to set a color palette
+
+```
+
+```{r load plot data}
+load(file = here::here("Data", "2021-43 Pumpkins.RData"))
+```
+
+
+```{r plot distribution of Field Pumpkins}
+desc <- 'These are outliers.'
+
+ggthemr(palette = "copper", type = "inner")
+pumpkin_plot <- pumpkins_weight %>%
+  filter(type == "Field Pumpkin") %>%
+  mutate(IQR_kilo = IQR(kilo, na.rm = TRUE),
+         outlier  = case_when(kilo > (quantile(kilo, .75, na.rm = T) + 1.5*IQR_kilo) ~ 1,
+                              kilo < (quantile(kilo, .25, na.rm = T) - 1.5*IQR_kilo) ~ 1,
+                              TRUE ~ 0)) %>%
+  ggplot(aes(x = type, y = kilo)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_point(aes(color = factor(outlier),
+                 fill  = factor(outlier),
+                 alpha = factor(outlier)),
+             position = position_jitter(seed = 1980, width = .3, height = .1), 
+             size     = 2, 
+             shape    = 21) +
+  ggforce::geom_mark_ellipse(aes(filter = outlier == 1, color="#AE7448"),
+                             size = .25,
+                             label.family   = "Charter",
+                             label.fontsize = 8, 
+                             label.colour   = "#614128",
+                             label.fill     = "#AE7448",
+                             label.margin   = margin(0.2, 0.2, 0.2, 0.2, "cm"),
+                             con.colour = "#AE7448",
+                             con.cap    = 0,
+                             description = desc,
+                             position = position_jitter(seed = 1980,
+                                                        width = .2,
+                                                        height = .1)) +
+  geom_text(x      = 0.5,
+            y      = 95,
+            color  = "white",
+            label  = "Almost 98kg!",
+            family = "Luminari",
+            size   = 3,
+            hjust  = 1) +
+  geom_curve(xend  = 1.05, 
+             x     = .55,
+             y     = 94,
+             yend  = 96, 
+             color = "white",
+             arrow = arrow(length = unit(0.2, "cm"), type = "closed", angle = 40)) +
+  stat_halfeye(justification = -.75, fill = "white", alpha = .75) +
+  coord_flip() +
+  labs(title = "<span style='font-size:24pt;'>Weight distribution of Field Pumpkins</span style><span style='font-size:10pt;'> (<em>in kilo)</span style><br>",
+       caption = "<br><br>Data source: BigPumpkins.com | #tidytuesday | @TinevanDaal | Inspired by @CedScherer") +
+  scale_y_continuous(breaks = seq(0, 100, 20), position = "right") +
+  scale_alpha_manual(values = c(.2, 1)) +
+  theme(text            = element_text(family = "Creepster"),
+        plot.title      = element_markdown(face = "bold"),
+        plot.title.position = "plot",
+        plot.caption    = element_markdown(size = 10, family = "Charter"),
+        axis.text.x     = element_text(),
+        axis.title      = element_blank(),
+        axis.text.y     = element_blank(),
+        legend.position = "none")
+
+pumpkin_plot
+```
+
+```{r save plot}
+pdf_file <- here::here("Figures", "2021-43 Pumpkins.pdf")
+
+ggsave(
+  pdf_file,
+  device = cairo_pdf,
+  width = 29.7, 
+  height = 21, 
+  units  = "cm"
+)
+
+```
+
+
+```{r clean workspace}
+rm(list = ls())
+```
