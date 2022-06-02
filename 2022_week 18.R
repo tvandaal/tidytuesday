@@ -48,9 +48,6 @@ Plot_1 <-
                      position = "top",
                      expand = c(0.01,0.01)) +
   scale_color_manual(values = c("grey80", "#4E3524", "red", "darkorange")) +
-  geom_richtext(data = text_data,
-                aes(x=x, y=y, label=label, power = NULL),
-                hjust = 0, size = 2, label.color = NA, lineheight = 1) + 
   labs(title="<span style='font-size:16pt;'><b>Total gigawatt of energy produced by power</b></span style><br><span style='font-size:9pt;'>The trends for <span style='color:#4E3524;'><b>coal</b></span style> and <span style='color:red;'><b>nuclear</b></span style> are hard to discern due to their large difference in range compared to that of the other powers (especially that of <span style='color:darkorange;'><b>solar energy</b></span style>)<sup>*</sup>.<br>") +
   theme_minimal() +
   coord_cartesian(clip = "off") +
