@@ -27,7 +27,7 @@ pumpkins_weight <-
   mutate(type = factor(type))
 
 save(pumpkins_weight,
-     file = here::here("Data", "2021-43 Pumpkins"))
+     file = here::here("Data", "2021-43_Pumpkins.RData"))
 
 # Clean workspace
 rm(list = ls())

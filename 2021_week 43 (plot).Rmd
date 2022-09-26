@@ -15,7 +15,7 @@ library(ggthemr)   # to set a color palette
 ```
 
 ```{r load plot data}
-load(file = here::here("Data", "2021-43 Pumpkins.RData"))
+load(file = here::here("Data", "2021-43_Pumpkins.RData"))
 ```
 
 
@@ -87,6 +87,16 @@ pdf_file <- here::here("Figures", "2021-43 Pumpkins.pdf")
 ggsave(
   pdf_file,
   device = cairo_pdf,
+  width = 29.7, 
+  height = 21, 
+  units  = "cm"
+)
+
+png_file <- here::here("Figures", "2021-43 Pumpkins.png")
+
+ggsave(
+  png_file,
+  device = png,
   width = 29.7, 
   height = 21, 
   units  = "cm"
