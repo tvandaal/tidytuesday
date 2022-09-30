@@ -2,6 +2,7 @@
 
 # Load packages ====
 library(tidyverse)
+library(here)
 library(ggtext)
 
 # Load data ====
@@ -126,7 +127,8 @@ background_data11 <-
           color = sample(common_lego_colors, 1))
 
 # Create Plot
-lego_sets %>%
+lego_plot <- 
+  lego_sets %>%
   group_by(year) %>%
   count() %>%
   ggplot() +
@@ -185,25 +187,42 @@ lego_sets %>%
                 ymin = ymin, ymax = ymax,
                 fill = color, color = color),
             alpha = .6) +
-#  geom_point(aes(x = year, y = n), size = 1) + 
   geom_line(aes(x = year, y = n), size = 2) +
-  labs(title = "Lego releases more and more sets over the year.",
-       subtitle = "The chart shows the number of lego sets released between 1949 and 2021.\n", 
+  labs(title = "<span style='font-size:15pt;'>Lego releases more and more sets over the year.</span style><br><span style='font-size:9pt;'><i>The chart shows the number of lego sets released between 1949 and 2021. Colors of the bricks are randomly picked and do not have a meaning.<br>", 
+       caption = "Data source: rebrickable.com | #tidytuesday | @TinevanDaal",
        y = "Number of lego sets released") +
   scale_color_identity() +
   scale_fill_identity() +
-  scale_x_continuous(breaks = seq(1950, 2020, 10),
+  scale_x_continuous(expand = expansion(add=c(0,1)),
+                     breaks = seq(1950, 2020, 10),
                      position = "top") +
   scale_y_continuous(expand = expansion(add=c(0,0)),
                      breaks = seq(0, 1000, 200),
                      limits = c(0,1093))+
   theme_minimal() +
   theme(text = element_text(family = "Glegoo"),
-        plot.title = element_textbox_simple(face = "bold", size = 15),
-        plot.subtitle = element_text(color = "grey30", size = 10),
+        plot.title = element_textbox_simple(face = "bold", lineheight=1),
         plot.title.position = "plot",
-        axis.title.y = element_text(size = 10, color = "grey80"),
+        plot.caption = element_text(size = 5, color = "grey80"),
+        plot.margin = margin(0,0,.5, 0, "cm"),
+        axis.title.y = element_text(size = 9, color = "grey80"),
         axis.text.x = element_text(size = 9),
         axis.text.y = element_text(size = 7, color = "grey80"),
         panel.grid = element_blank(),
         axis.title.x = element_blank())
+
+# Save plot ====
+pdf_file <- here("Figures", "2022-36 Lego.pdf")
+
+ggsave(
+  pdf_file,
+  device = cairo_pdf,
+  width = 22, 
+  height = 16,
+  unit = "cm"
+)
+
+
+
+rm(list = ls())
+
