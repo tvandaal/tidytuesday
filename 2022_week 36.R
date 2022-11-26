@@ -127,7 +127,7 @@ background_data11 <-
           color = sample(common_lego_colors, 1))
 
 # Create Plot
-lego_plot <- 
+#lego_plot <- 
   lego_sets %>%
   group_by(year) %>%
   count() %>%
