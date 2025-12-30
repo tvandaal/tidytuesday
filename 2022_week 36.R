@@ -12,7 +12,7 @@ lego_sets <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/
 glimpse(lego_sets)
 skimr::skim(lego_sets)
 
-# Create to plot bricks in background
+# Create data to plot bricks in background ====
 common_lego_colors <- c("#F12D3E", "#0055AD", "#F6B800", "#00704A")
 
 background_data1 <- 
@@ -126,7 +126,7 @@ background_data11 <-
           ymin = 1000.01, ymax = 1092, year=NA,
           color = sample(common_lego_colors, 1))
 
-# Create Plot
+# Create plots ====
 #lego_plot <- 
   lego_sets %>%
   group_by(year) %>%
